@@ -45,7 +45,7 @@ function create_extensions_file(opts, info, cb) {
  */
 exports.create_cert_request_config = function (opts, info, cb) {
   var hash = info.subject;
-  var s = "[ req ]\ndefault_bits           = 1024\n" +
+  var s = "[ req ]\ndefault_bits           = 2048\n" +
     "default_keyfile        = keyfile.pem\n" +
     "distinguished_name     = req_distinguished_name\n" +
     "prompt                 = no\n\n" +
@@ -79,7 +79,7 @@ exports.create_cert_request_config = function (opts, info, cb) {
 exports.create_keypair = function (opts, cb) {
   tmp.file(opts, function tmpFileCb(err, path) {
     if (err) return cb(err);
-    child.exec('openssl genrsa -out ' + path + ' 1024', function execCb(err) {
+    child.exec('openssl genrsa -out ' + path + ' 2048', function execCb(err) {
       cb(err, path);
     });
   });  
