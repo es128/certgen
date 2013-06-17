@@ -36,10 +36,10 @@ function create_extensions_file(opts, info, cb) {
 /*
  * Create a certificate request configuration file.
  * opts: file creation options. 'prefix' sets file prefix.
- *       'keep' instructs whether to keep the file upon process exit. 
- * info: Object containing a required 'subject' property containing subject's 
+ *       'keep' instructs whether to keep the file upon process exit.
+ * info: Object containing a required 'subject' property containing subject's
  *       distinguished name information, and an optional 'subjectaltname' string property
- *       listing the alternate subject names, if any. 
+ *       listing the alternate subject names, if any.
  * cb: a callback of the form cb(err, path), where path is the path
  *     of the certificate request file, if successful.
  */
@@ -59,7 +59,7 @@ exports.create_cert_request_config = function (opts, info, cb) {
         val = val[0]; // hack to handle OUs that are arrays of strings
       s = s + key + " = " + val + "\n";
     }
-  });  
+  });
 
   tmp.file(opts, function tmpFileCb(err, path) {
     if (err) return cb(err);
@@ -72,7 +72,7 @@ exports.create_cert_request_config = function (opts, info, cb) {
 /*
  * Create a keypair.
  * opts: file creation options. 'prefix' sets file prefix.
- *       'keep' instructs whether to keep the file upon process exit. 
+ *       'keep' instructs whether to keep the file upon process exit.
  * cb: a callback of the form cb(err, path), where path is the path
  *     of the created file, if successful.
  */
@@ -82,13 +82,13 @@ exports.create_keypair = function (opts, cb) {
     child.exec('openssl genrsa -out ' + path + ' 2048', function execCb(err) {
       cb(err, path);
     });
-  });  
+  });
 }
 
 /*
  * Create a certification request.
  * opts: file creation options. 'prefix' sets file prefix.
- *       'keep' instructs whether to keep the file upon process exit. 
+ *       'keep' instructs whether to keep the file upon process exit.
  * keyPath: the file containing the subject's public key
  * cfgPath: the request configuration file
  * cb: a callback of the form cb(err, path), where path is the path
@@ -101,13 +101,13 @@ exports.create_cert_request = function (opts, keyPath, cfgPath, cb) {
                function execCb(err) {
       cb(err, path);
     });
-  });    
+  });
 }
 
 /*
  * Create a signed certificate from request file.
  * opts: file creation options. 'prefix' sets file prefix.
- *       'keep' instructs whether to keep the file upon process exit. 
+ *       'keep' instructs whether to keep the file upon process exit.
  * reqPath: the certification request file
  * caKeyPath: the signer's key
  * caCertPath: the signer's certificate
@@ -123,22 +123,22 @@ exports.create_cert = function (opts, reqPath, caKeyPath, caCertPath, extPath, c
                 function execCb(err) {
       cb(err, path);
     });
-  });    
+  });
 }
 
 /*
  * Generate a signed certificate from supplied information.
- * prefix: Temporary file prefix. 
+ * prefix: Temporary file prefix.
  * keepFiles: Whether to keep generated files upon process exit.
- * info: Object containing a required 'subject' property containing subject's 
+ * info: Object containing a required 'subject' property containing subject's
  *       distinguished name information, and an optional 'subjectaltname' string property
- *       listing the alternate subject names, if any. 
+ *       listing the alternate subject names, if any.
  * caKeyPath: the signer's key
  * caCertPath: the signer's certificate
  * cb: a callback of the form cb(err, keyPath, certPath)
  */
 exports.generate_cert = function (prefix, keepFiles, info, caKeyPath, caCertPath, cb) {
-  
+
   var tmpFiles = [];
   var opts = { prefix:prefix + '-', postfix:'.pem'}
   exports.create_keypair(opts, function(err, keyPath) {
@@ -164,20 +164,20 @@ exports.generate_cert = function (prefix, keepFiles, info, caKeyPath, caCertPath
             cb(err, keyPath, certPath);
           });
         });
-      });            
-    });  
-  });  
+      });
+    });
+  });
 }
 
 /*
  * Same as generate_cert, except that key and certificate contents are returned
  * as buffers instead of paths.
- * 
- * prefix: Temporary file prefix. 
+ *
+ * prefix: Temporary file prefix.
  * keepFiles: Whether to keep generated files upon process exit.
- * info: Object containing a required 'subject' property containing subject's 
+ * info: Object containing a required 'subject' property containing subject's
  *       distinguished name information, and an optional 'subjectaltname' string property
- *       listing the alternate subject names, if any. 
+ *       listing the alternate subject names, if any.
  * caKeyPath: the signer's key
  * caCertPath: the signer's certificate
  * cb: a callback of the form cb(err, keyBuf, certBuf)
