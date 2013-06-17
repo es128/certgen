@@ -121,7 +121,11 @@ exports.create_cert = function (opts, reqPath, caKeyPath, caCertPath, extPath, c
                 caCertPath + ' -out ' + path + ' -CAcreateserial' +
                 ' -extensions v3_ca -extfile ' + extPath,
                 function execCb(err) {
-      cb(err, path);
+      child.exec('openssl x509 -noout -in ' + path + ' -fingerprint -hash',
+                  function statsCb(err, stdout) {
+        output = stdout.toString().split(/\n/);
+        cb(err, path, output[0], output[1]);
+      });
     });
   });
 }
@@ -158,10 +162,11 @@ exports.generate_cert = function (prefix, keepFiles, info, caKeyPath, caCertPath
           if (err) return cb(err);
           tmpFiles.push(reqPath);
           opts.prefix = prefix + '-cert-';
-          exports.create_cert(opts, reqPath, caKeyPath, caCertPath, extPath, function (err, certPath) {
+          exports.create_cert(opts, reqPath, caKeyPath, caCertPath, extPath,
+                              function (err, certPath, fingerprint, hash) {
             if (!keepFiles)
               tmpFiles.forEach( function(path) { fs.unlink(path); } );
-            cb(err, keyPath, certPath);
+            cb(err, keyPath, certPath, fingerprint, hash);
           });
         });
       });
@@ -184,7 +189,7 @@ exports.generate_cert = function (prefix, keepFiles, info, caKeyPath, caCertPath
  */
 exports.generate_cert_buf = function (prefix, keepFiles, info, caKeyPath, caCertPath, cb) {
   exports.generate_cert(prefix, keepFiles, info, caKeyPath, caCertPath,
-                        function (err, keyPath, certPath){
+                        function (err, keyPath, certPath, fingerprint, hash){
     if (err) return cb(err);
     fs.readFile(certPath, function (err, certBuf) {
       if (err) return cb(err);
@@ -193,7 +198,7 @@ exports.generate_cert_buf = function (prefix, keepFiles, info, caKeyPath, caCert
           fs.unlink(certPath);
           fs.unlink(keyPath);
         }
-        cb(err, keyBuf, certBuf);
+        cb(err, keyBuf, certBuf, fingerprint, hash);
       });
     });
   });
