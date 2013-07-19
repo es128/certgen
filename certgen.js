@@ -117,9 +117,13 @@ exports.create_cert_request = function (opts, keyPath, cfgPath, cb) {
 exports.create_cert = function (opts, reqPath, caKeyPath, caCertPath, extPath, cb) {
   tmp.file(opts, function tmpFileCb(err, path) {
     if (err) return cb(err);
+    var setDays = '';
+    if (exports.days && exports.days === parseInt(exports.days, 10)) {
+      setDays = ' -days ' + exports.days;
+    }
     child.exec('openssl x509 -req -in ' + reqPath + ' -CAkey ' + caKeyPath + ' -CA ' +
                 caCertPath + ' -out ' + path + ' -CAcreateserial' +
-                ' -extensions v3_ca -extfile ' + extPath,
+                ' -extensions v3_ca -extfile ' + extPath + setDays,
                 function execCb(err) {
       child.exec('openssl x509 -noout -in ' + path + ' -fingerprint -hash',
                   function statsCb(err, stdout) {
