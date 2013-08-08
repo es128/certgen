@@ -125,6 +125,7 @@ exports.create_cert = function (opts, reqPath, caKeyPath, caCertPath, extPath, c
                 caCertPath + ' -out ' + path + ' -CAcreateserial' +
                 ' -extensions v3_ca -extfile ' + extPath + setDays,
                 function execCb(err) {
+      if (err) return cb(err);
       child.exec('openssl x509 -noout -in ' + path + ' -fingerprint -hash',
                   function statsCb(err, stdout) {
         output = stdout.toString().split(/\n/);
@@ -168,6 +169,7 @@ exports.generate_cert = function (prefix, keepFiles, info, caKeyPath, caCertPath
           opts.prefix = prefix + '-cert-';
           exports.create_cert(opts, reqPath, caKeyPath, caCertPath, extPath,
                               function (err, certPath, fingerprint, hash) {
+            if (err) return cb(err);
             if (!keepFiles)
               tmpFiles.forEach( function(path) { fs.unlink(path); } );
             cb(err, keyPath, certPath, fingerprint, hash);
@@ -198,6 +200,7 @@ exports.generate_cert_buf = function (prefix, keepFiles, info, caKeyPath, caCert
     fs.readFile(certPath, function (err, certBuf) {
       if (err) return cb(err);
       fs.readFile(keyPath, function (err, keyBuf) {
+        if (err) return cb(err);
         if (!keepFiles) {
           fs.unlink(certPath);
           fs.unlink(keyPath);
